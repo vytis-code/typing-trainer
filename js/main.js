@@ -26,6 +26,9 @@ function start(index) {
 
   hintEl.textContent = "Start typing to begin. Backspace fixes mistakes.";
   hintEl.classList.remove("done");
+  // WPM and accuracy stay blank until the exercise is finished.
+  wpmEl.textContent = "–";
+  accuracyEl.textContent = "–";
   render();
   textEl.focus();
 }
@@ -37,13 +40,17 @@ function render() {
     el.classList.toggle("incorrect", states[i] === "incorrect");
     el.classList.toggle("current", i === session.typed.length);
   });
-  renderStats();
+  renderTime();
 }
 
-function renderStats() {
+function renderTime() {
+  timeEl.textContent = getStats(session, performance.now()).seconds;
+}
+
+function renderFinalStats() {
   const stats = getStats(session, performance.now());
   wpmEl.textContent = stats.wpm;
-  accuracyEl.textContent = stats.accuracy;
+  accuracyEl.textContent = `${stats.accuracy}%`;
   timeEl.textContent = stats.seconds;
 }
 
@@ -61,7 +68,7 @@ document.addEventListener("keydown", (e) => {
     e.preventDefault(); // stops Space from scrolling the page
     const wasStarted = session.startTime !== null;
     typeChar(session, e.key, performance.now());
-    if (!wasStarted) timerId = setInterval(renderStats, 250);
+    if (!wasStarted) timerId = setInterval(renderTime, 250);
   } else {
     return;
   }
@@ -70,8 +77,8 @@ document.addEventListener("keydown", (e) => {
 
   if (isFinished(session)) {
     clearInterval(timerId);
-    const { wpm, accuracy } = getStats(session, performance.now());
-    hintEl.textContent = `Done! ${wpm} WPM at ${accuracy}% accuracy. Press Restart or New text.`;
+    renderFinalStats();
+    hintEl.textContent = "Done! Press Restart or New text.";
     hintEl.classList.add("done");
   }
 });
