@@ -84,6 +84,14 @@ document.addEventListener("keydown", (e) => {
 });
 
 document.getElementById("restart").addEventListener("click", () => start(textIndex));
-document.getElementById("next").addEventListener("click", () => start((textIndex + 1) % TEXTS.length));
+document.getElementById("next").addEventListener("click", () => start(randomOtherIndex(textIndex)));
+
+// Random index into TEXTS, never the current one (unless there is only one text).
+function randomOtherIndex(current) {
+  if (TEXTS.length < 2) return current;
+  // Pick from the other length - 1 slots, then skip over the current one.
+  const i = Math.floor(Math.random() * (TEXTS.length - 1));
+  return i >= current ? i + 1 : i;
+}
 
 start(0);
