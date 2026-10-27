@@ -53,6 +53,9 @@ function render() {
     el.classList.toggle("incorrect", states[i] === "incorrect");
     el.classList.toggle("current", i === session.typed.length);
   });
+  // With a wrong last letter the cursor waits after it, until Backspace is pressed.
+  const waitingAtEnd = session.typed.length === charEls.length && !isFinished(session);
+  charEls.at(-1).classList.toggle("current-end", waitingAtEnd);
   renderTime();
 }
 

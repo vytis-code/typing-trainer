@@ -11,7 +11,8 @@ function createSession(target) {
 }
 
 function typeChar(session, char, now) {
-  if (isFinished(session)) return;
+  // At the end with a wrong last letter there is nowhere left to type: only Backspace helps.
+  if (session.typed.length >= session.target.length) return;
   if (session.startTime === null) session.startTime = now;
 
   const expected = session.target[session.typed.length];
@@ -27,8 +28,12 @@ function backspace(session) {
   session.typed = session.typed.slice(0, -1);
 }
 
+// Finished once the whole length is typed and the last letter is correct.
+// Earlier mistakes don't block finishing; they only lower accuracy.
 function isFinished(session) {
-  return session.typed.length >= session.target.length;
+  const last = session.target.length - 1;
+  return session.typed.length === session.target.length
+    && session.typed[last] === session.target[last];
 }
 
 // Returns "correct", "incorrect", or "pending" for each character in the target.

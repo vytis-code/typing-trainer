@@ -93,7 +93,8 @@ h1 {
 }
 
 /* Keep the cursor still under the blur; it only blinks while typing. */
-.text-wrap:not(:focus-within) .char.current {
+.text-wrap:not(:focus-within) .char.current,
+.text-wrap:not(:focus-within) .char.current-end {
   animation: none;
 }
 
@@ -120,15 +121,22 @@ h1 {
   margin-left: -2px;
 }
 
+/* Cursor after the last letter, when it is wrong and waiting to be fixed. */
+.char.current-end {
+  border-right: 2px solid var(--cursor);
+  margin-right: -2px;
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  .char.current {
+  .char.current,
+  .char.current-end {
     animation: blink 1s step-end infinite;
   }
 }
 
 @keyframes blink {
   50% {
-    border-left-color: transparent;
+    border-color: transparent;
   }
 }
 
