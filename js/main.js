@@ -74,6 +74,19 @@ function renderFinalStats() {
 textEl.addEventListener("keydown", (e) => {
   // Leave browser shortcuts (Ctrl+R, Ctrl+L, ...) alone.
   if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+  // Shortcuts. Enter only works before typing or after finishing, so a stray Enter can't throw away progress.
+  if (e.key === "Escape") {
+    e.preventDefault();
+    start(textIndex);
+    return;
+  }
+  if (e.key === "Enter" && (session.typed.length === 0 || isFinished(session))) {
+    e.preventDefault();
+    start(randomOtherIndex(textIndex));
+    return;
+  }
+
   if (isFinished(session)) return;
 
   if (e.key === "Backspace") {
