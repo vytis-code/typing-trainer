@@ -16,9 +16,11 @@
       <span>Time: <strong id="time">0</strong>s</span>
     </div>
 
-    <div id="text" class="text" tabindex="0" aria-label="Text to type. Start typing to begin."></div>
-
-    <p id="hint" class="hint">Start typing to begin. Backspace fixes mistakes.</p>
+    <div class="text-wrap">
+      <div id="text" class="text" tabindex="0" aria-label="Text to type. Start typing to begin."></div>
+      <!-- Shown on top of the blurred text whenever the text box is not focused. -->
+      <div class="overlay" aria-hidden="true">Click here to start typing.<br>Backspace fixes mistakes.</div>
+    </div>
 
     <div class="controls">
       <button id="restart" type="button">Restart</button>

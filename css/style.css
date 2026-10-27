@@ -46,6 +46,11 @@ h1 {
   font-variant-numeric: tabular-nums;
 }
 
+.text-wrap {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
 .text {
   background: var(--panel);
   border-radius: 8px;
@@ -61,6 +66,37 @@ h1 {
 
 .text:focus-visible {
   box-shadow: 0 0 0 2px var(--cursor);
+}
+
+/* Clicks pass through the overlay to the text box underneath, which focuses it. */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--text);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.text-wrap:not(:focus-within) .overlay {
+  opacity: 1;
+}
+
+.text-wrap:not(:focus-within) .text {
+  filter: blur(5px);
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .overlay,
+  .text {
+    transition: opacity 0.15s, filter 0.15s;
+  }
 }
 
 .char.correct {
@@ -89,16 +125,6 @@ h1 {
   50% {
     border-left-color: transparent;
   }
-}
-
-.hint {
-  color: var(--muted);
-  min-height: 1.5em;
-}
-
-.hint.done {
-  color: var(--correct);
-  font-weight: 600;
 }
 
 .controls {

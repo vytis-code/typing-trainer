@@ -1,5 +1,4 @@
 const textEl = document.getElementById("text");
-const hintEl = document.getElementById("hint");
 const wpmEl = document.getElementById("wpm");
 const accuracyEl = document.getElementById("accuracy");
 const timeEl = document.getElementById("time");
@@ -24,8 +23,6 @@ function start(index) {
     return span;
   });
 
-  hintEl.textContent = "Start typing to begin. Backspace fixes mistakes.";
-  hintEl.classList.remove("done");
   // WPM and accuracy stay blank until the exercise is finished.
   wpmEl.textContent = "–";
   accuracyEl.textContent = "–";
@@ -54,10 +51,10 @@ function renderFinalStats() {
   timeEl.textContent = stats.seconds;
 }
 
-document.addEventListener("keydown", (e) => {
-  // Leave browser shortcuts (Ctrl+R, Ctrl+L, ...) and focused buttons alone.
+// Keys only count while the text box has focus.
+textEl.addEventListener("keydown", (e) => {
+  // Leave browser shortcuts (Ctrl+R, Ctrl+L, ...) alone.
   if (e.ctrlKey || e.metaKey || e.altKey) return;
-  if (e.target instanceof HTMLButtonElement && (e.key === "Enter" || e.key === " ")) return;
   if (isFinished(session)) return;
 
   if (e.key === "Backspace") {
@@ -78,13 +75,25 @@ document.addEventListener("keydown", (e) => {
   if (isFinished(session)) {
     clearInterval(timerId);
     renderFinalStats();
-    hintEl.textContent = "Done! Press Restart or New text.";
-    hintEl.classList.add("done");
   }
+});
+
+// Leaving the text box pauses the clock; the overlay and blur come from CSS.
+textEl.addEventListener("blur", () => clearInterval(timerId));
+
+// Coming back to a text that was already started restarts it from zero.
+// A fresh session (nothing typed yet) is left as it is, so start() focusing it doesn't loop.
+textEl.addEventListener("focus", () => {
+  if (session.typed.length > 0) start(textIndex);
 });
 
 document.getElementById("restart").addEventListener("click", () => start(textIndex));
 document.getElementById("next").addEventListener("click", () => start(randomOtherIndex(textIndex)));
+
+// Keep focus on the text box when a button is clicked, so the overlay doesn't flash.
+document.querySelectorAll(".controls button").forEach((btn) => {
+  btn.addEventListener("mousedown", (e) => e.preventDefault());
+});
 
 // Random index into TEXTS, never the current one (unless there is only one text).
 function randomOtherIndex(current) {
