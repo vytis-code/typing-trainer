@@ -1,0 +1,126 @@
+:root {
+  --bg: #1e2128;
+  --panel: #282c34;
+  --text: #e6e6e6;
+  --muted: #7d8590;
+  --correct: #98c379;
+  --incorrect: #e06c75;
+  --incorrect-bg: rgba(224, 108, 117, 0.2);
+  --cursor: #e5c07b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.app {
+  width: min(900px, 100% - 32px);
+  margin-top: 8vh;
+}
+
+h1 {
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.stats {
+  display: flex;
+  gap: 2rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+.stats strong {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.text {
+  background: var(--panel);
+  border-radius: 8px;
+  padding: 1.5rem;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 1.5rem;
+  line-height: 2;
+  color: var(--muted);
+  white-space: pre-wrap;
+  word-break: break-word;
+  outline: none;
+}
+
+.text:focus-visible {
+  box-shadow: 0 0 0 2px var(--cursor);
+}
+
+.char.correct {
+  color: var(--correct);
+}
+
+/* Underline as well as colour, so errors are visible without relying on red alone. */
+.char.incorrect {
+  color: var(--incorrect);
+  background: var(--incorrect-bg);
+  text-decoration: underline wavy;
+}
+
+.char.current {
+  border-left: 2px solid var(--cursor);
+  margin-left: -2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .char.current {
+    animation: blink 1s step-end infinite;
+  }
+}
+
+@keyframes blink {
+  50% {
+    border-left-color: transparent;
+  }
+}
+
+.hint {
+  color: var(--muted);
+  min-height: 1.5em;
+}
+
+.hint.done {
+  color: var(--correct);
+  font-weight: 600;
+}
+
+.controls {
+  display: flex;
+  gap: 0.75rem;
+}
+
+button {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--muted);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--text);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--cursor);
+  outline-offset: 2px;
+}

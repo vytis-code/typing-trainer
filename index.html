@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typing Trainer</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="app">
+    <h1>Typing Trainer</h1>
+
+    <div class="stats" aria-live="polite">
+      <span>WPM: <strong id="wpm">0</strong></span>
+      <span>Accuracy: <strong id="accuracy">100</strong>%</span>
+      <span>Time: <strong id="time">0</strong>s</span>
+    </div>
+
+    <div id="text" class="text" tabindex="0" aria-label="Text to type. Start typing to begin."></div>
+
+    <p id="hint" class="hint">Start typing to begin. Backspace fixes mistakes.</p>
+
+    <div class="controls">
+      <button id="restart" type="button">Restart</button>
+      <button id="next" type="button">New text</button>
+    </div>
+  </main>
+
+  <!-- Classic scripts (not modules) so the page also works when opened directly from disk. -->
+  <script src="js/texts.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
