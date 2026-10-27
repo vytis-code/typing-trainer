@@ -7,6 +7,7 @@ let textIndex = 0;
 let session;
 let charEls = [];
 let timerId = null;
+let lastResult = null; // stats of the last finished exercise, shown until a new one finishes
 
 function start(index) {
   textIndex = index;
@@ -23,11 +24,16 @@ function start(index) {
     return span;
   });
 
-  // WPM and accuracy stay blank until the exercise is finished.
-  wpmEl.textContent = "–";
-  accuracyEl.textContent = "–";
+  renderLastResult();
   render();
   textEl.focus();
+}
+
+// Shows the last finished exercise, or dashes if there isn't one yet.
+function renderLastResult() {
+  wpmEl.textContent = lastResult ? lastResult.wpm : "–";
+  accuracyEl.textContent = lastResult ? `${lastResult.accuracy}%` : "–";
+  timeEl.textContent = lastResult ? lastResult.seconds : "–";
 }
 
 function render() {
@@ -40,15 +46,15 @@ function render() {
   renderTime();
 }
 
+// The time counts live once typing starts; before that it keeps showing the last result.
 function renderTime() {
+  if (session.startTime === null) return;
   timeEl.textContent = getStats(session, performance.now()).seconds;
 }
 
 function renderFinalStats() {
-  const stats = getStats(session, performance.now());
-  wpmEl.textContent = stats.wpm;
-  accuracyEl.textContent = `${stats.accuracy}%`;
-  timeEl.textContent = stats.seconds;
+  lastResult = getStats(session, performance.now());
+  renderLastResult();
 }
 
 // Keys only count while the text box has focus.
