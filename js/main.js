@@ -8,7 +8,8 @@ let textIndex = 0;
 let session;
 let charEls = [];
 let timerId = null;
-let lastResult = null; // stats of the last finished exercise, shown until a new one finishes
+// Stats of the last finished exercise, shown until a new one finishes. Survives a page reload.
+let lastResult = loadAttempts().at(-1) ?? null;
 
 function start(index) {
   textIndex = index;
@@ -67,6 +68,7 @@ function renderTime() {
 
 function renderFinalStats() {
   lastResult = getStats(session, performance.now());
+  saveAttempt({ date: new Date().toISOString(), charCount: session.target.length, ...lastResult });
   renderLastResult();
 }
 
