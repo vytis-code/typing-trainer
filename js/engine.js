@@ -41,7 +41,7 @@ function charStates(session) {
 
 function getStats(session, now) {
   if (session.startTime === null) {
-    return { wpm: 0, accuracy: 100, seconds: 0 };
+    return { wpm: 0, accuracy: 100, finalAccuracy: 100, seconds: 0 };
   }
   const end = session.endTime ?? now;
   const minutes = (end - session.startTime) / 60000;
@@ -56,6 +56,10 @@ function getStats(session, now) {
   const accuracy = session.keystrokes > 0
     ? Math.round(((session.keystrokes - session.errors) / session.keystrokes) * 100)
     : 100;
+  // Only looks at what is left on screen, so mistakes fixed with Backspace don't count.
+  const finalAccuracy = session.typed.length > 0
+    ? Math.round((correct / session.typed.length) * 100)
+    : 100;
 
-  return { wpm, accuracy, seconds: Math.floor((end - session.startTime) / 1000) };
+  return { wpm, accuracy, finalAccuracy, seconds: Math.floor((end - session.startTime) / 1000) };
 }

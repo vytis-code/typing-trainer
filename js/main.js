@@ -1,6 +1,7 @@
 const textEl = document.getElementById("text");
 const wpmEl = document.getElementById("wpm");
 const accuracyEl = document.getElementById("accuracy");
+const finalAccuracyEl = document.getElementById("final-accuracy");
 const timeEl = document.getElementById("time");
 
 let textIndex = 0;
@@ -31,9 +32,18 @@ function start(index) {
 
 // Shows the last finished exercise, or dashes if there isn't one yet.
 function renderLastResult() {
-  wpmEl.textContent = lastResult ? lastResult.wpm : "–";
-  accuracyEl.textContent = lastResult ? `${lastResult.accuracy}%` : "–";
-  timeEl.textContent = lastResult ? lastResult.seconds : "–";
+  setStat(wpmEl, lastResult?.wpm);
+  setStat(accuracyEl, lastResult?.accuracy);
+  setStat(finalAccuracyEl, lastResult?.finalAccuracy);
+  setStat(timeEl, lastResult?.seconds);
+}
+
+// Writes a number, or "–" when there is none. The unit right after it (%, s) is hidden with the dash.
+function setStat(el, value) {
+  const missing = value === undefined;
+  el.textContent = missing ? "–" : value;
+  const unit = el.nextElementSibling;
+  if (unit?.classList.contains("unit")) unit.hidden = missing;
 }
 
 function render() {
@@ -49,7 +59,7 @@ function render() {
 // The time counts live once typing starts; before that it keeps showing the last result.
 function renderTime() {
   if (session.startTime === null) return;
-  timeEl.textContent = getStats(session, performance.now()).seconds;
+  setStat(timeEl, getStats(session, performance.now()).seconds);
 }
 
 function renderFinalStats() {

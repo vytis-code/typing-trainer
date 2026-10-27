@@ -11,9 +11,13 @@
     <h1>Typing Trainer</h1>
 
     <div class="stats" aria-live="polite">
+      <!-- Only the numbers are bold; a unit is hidden while its value is "–". -->
       <span>WPM: <strong id="wpm">–</strong></span>
-      <span>Accuracy: <strong id="accuracy">–</strong></span>
-      <span>Time: <strong id="time">–</strong>s</span>
+      <span title="Final: mistakes you fixed with Backspace don't count">
+        Accuracy: <strong id="accuracy">–</strong><span class="unit">%</span>
+        (final <strong id="final-accuracy">–</strong><span class="unit">%</span>)
+      </span>
+      <span>Time: <strong id="time">–</strong><span class="unit">s</span></span>
     </div>
 
     <div class="text-wrap">
