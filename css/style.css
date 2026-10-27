@@ -92,6 +92,11 @@ h1 {
   cursor: pointer;
 }
 
+/* Keep the cursor still under the blur; it only blinks while typing. */
+.text-wrap:not(:focus-within) .char.current {
+  animation: none;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .overlay,
   .text {
