@@ -7,15 +7,26 @@ const wpmEl = document.getElementById("wpm");
 const accuracyEl = document.getElementById("accuracy");
 const finalAccuracyEl = document.getElementById("final-accuracy");
 
-let textIndex = 0;
+// Practice texts are random words in the page language, about TEXT_LENGTH characters long (spaces included).
+const TEXT_LENGTH = 100;
+const WORD_LISTS = { en: cleanWords(WORDS_EN), lt: cleanWords(WORDS_LT) };
+
+function newText() {
+  // A language without a word list yet falls back to English.
+  const words = WORD_LISTS[language]?.length ? WORD_LISTS[language] : WORD_LISTS.en;
+  return generateText(words, TEXT_LENGTH);
+}
+
+let currentText;
 let session;
 let charEls = [];
 // Stats of the last finished exercise, shown until a new one finishes. Survives a page reload.
 let lastResult = loadAttempts().at(-1) ?? null;
 
-function start(index) {
-  textIndex = index;
-  session = createSession(TEXTS[textIndex]);
+// Starts an exercise on the given text; restarting passes the current text again.
+function start(text) {
+  currentText = text;
+  session = createSession(text);
 
   textEl.innerHTML = "";
   charEls = [...session.target].map((ch) => {
@@ -164,6 +175,7 @@ function switchLanguage(code) {
   updateLanguageSwitch();
   renderDynamicTexts();
   renderProgress(); // chart labels, tooltip text and dates
+  start(newText()); // practice words in the new language
 }
 
 updateLanguageSwitch();
@@ -186,12 +198,12 @@ textEl.addEventListener("keydown", (e) => {
   // Shortcuts. Enter only works before typing or after finishing, so a stray Enter can't throw away progress.
   if (e.key === "Escape") {
     e.preventDefault();
-    start(textIndex);
+    start(currentText);
     return;
   }
   if (e.key === "Enter" && (session.typed.length === 0 || isFinished(session))) {
     e.preventDefault();
-    start(randomOtherIndex(textIndex));
+    start(newText());
     return;
   }
 
@@ -217,23 +229,15 @@ textEl.addEventListener("keydown", (e) => {
 // Coming back to a text that was already started restarts it from zero.
 // A fresh session (nothing typed yet) is left as it is, so start() focusing it doesn't loop.
 textEl.addEventListener("focus", () => {
-  if (session.typed.length > 0) start(textIndex);
+  if (session.typed.length > 0) start(currentText);
 });
 
-document.getElementById("restart").addEventListener("click", () => start(textIndex));
-document.getElementById("next").addEventListener("click", () => start(randomOtherIndex(textIndex)));
+document.getElementById("restart").addEventListener("click", () => start(currentText));
+document.getElementById("next").addEventListener("click", () => start(newText()));
 
 // Keep focus on the text box when a button is clicked, so the overlay doesn't flash.
 document.querySelectorAll(".controls button").forEach((btn) => {
   btn.addEventListener("mousedown", (e) => e.preventDefault());
 });
 
-// Random index into TEXTS, never the current one (unless there is only one text).
-function randomOtherIndex(current) {
-  if (TEXTS.length < 2) return current;
-  // Pick from the other length - 1 slots, then skip over the current one.
-  const i = Math.floor(Math.random() * (TEXTS.length - 1));
-  return i >= current ? i + 1 : i;
-}
-
-start(0);
+start(newText());
