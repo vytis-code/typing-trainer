@@ -70,7 +70,66 @@ function renderFinalStats() {
   lastResult = getStats(session, performance.now());
   saveAttempt({ date: new Date().toISOString(), charCount: session.target.length, ...lastResult });
   renderLastResult();
+  renderProgress();
 }
+
+// Progress chart: one view, a tab per stat.
+const chartEl = document.getElementById("chart");
+const tabEls = document.querySelectorAll(".tabs [role=tab]");
+const CHART_ATTEMPTS = 20;
+// minSpan: the smallest y range shown, so tiny differences don't look like big swings.
+const METRICS = {
+  wpm: { label: "WPM", unit: "", minSpan: 10 },
+  accuracy: { label: "Accuracy", unit: "%", minSpan: 5, max: 100 },
+  finalAccuracy: { label: "Final accuracy", unit: "%", minSpan: 5, max: 100 },
+  seconds: { label: "Time", unit: "s", minSpan: 5 },
+};
+let chartMetric = "wpm";
+
+function renderProgress() {
+  const attempts = loadAttempts();
+  const first = Math.max(0, attempts.length - CHART_ATTEMPTS);
+  const points = attempts.slice(first)
+    .map((a, i) => ({ value: a[chartMetric], number: first + i + 1, date: a.date }))
+    .filter((p) => typeof p.value === "number");
+  renderChart(chartEl, points, METRICS[chartMetric]);
+}
+
+tabEls.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    chartMetric = tab.dataset.metric;
+    tabEls.forEach((t) => t.setAttribute("aria-selected", t === tab));
+    renderProgress();
+  });
+});
+
+// Show/hide the whole progress section. The choice is remembered between visits.
+const progressEl = document.getElementById("progress");
+const toggleChartEl = document.getElementById("toggle-chart");
+
+function setChartVisible(visible) {
+  progressEl.hidden = !visible;
+  toggleChartEl.textContent = visible ? "Hide graph" : "Show graph";
+  toggleChartEl.setAttribute("aria-expanded", visible);
+  // While hidden the chart has no width to draw to, so draw it fresh when it appears.
+  if (visible) renderProgress();
+}
+
+toggleChartEl.addEventListener("click", () => {
+  const visible = progressEl.hidden;
+  setChartVisible(visible);
+  saveSetting("chartVisible", visible);
+});
+
+setChartVisible(loadSettings().chartVisible ?? true);
+
+// The chart is drawn to the container's width, so redraw when that changes.
+let chartWidth = 0;
+new ResizeObserver(() => {
+  if (chartEl.clientWidth === chartWidth) return;
+  chartWidth = chartEl.clientWidth;
+  renderProgress();
+}).observe(chartEl);
 
 // Keys only count while the text box has focus.
 textEl.addEventListener("keydown", (e) => {

@@ -17,6 +17,25 @@ function loadAttempts() {
   return loadData().attempts;
 }
 
+// Small view preferences, kept apart from the attempt history.
+const SETTINGS_KEY = "typing-trainer-settings";
+
+function loadSettings() {
+  try {
+    return JSON.parse(localStorage.getItem(SETTINGS_KEY)) ?? {};
+  } catch {
+    return {};
+  }
+}
+
+function saveSetting(name, value) {
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ ...loadSettings(), [name]: value }));
+  } catch {
+    // Storage blocked: the setting just isn't remembered.
+  }
+}
+
 // attempt: { date, charCount, wpm, accuracy, finalAccuracy, seconds }
 function saveAttempt(attempt) {
   const data = loadData();

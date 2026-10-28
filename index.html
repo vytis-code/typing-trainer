@@ -29,13 +29,28 @@
     <div class="controls">
       <button id="restart" type="button">Restart <kbd>Esc</kbd></button>
       <button id="next" type="button" title="Enter works before you start typing or after finishing a text">New text <kbd>Enter</kbd></button>
+      <button id="toggle-chart" type="button" aria-controls="progress" aria-expanded="true">Hide graph</button>
     </div>
+
+    <section id="progress" class="progress" aria-labelledby="progress-title">
+      <div class="progress-header">
+        <h2 id="progress-title">Progress <span class="progress-sub">last 20 attempts</span></h2>
+        <div class="tabs" role="tablist" aria-label="Stat to show">
+          <button type="button" role="tab" data-metric="wpm" aria-selected="true">WPM</button>
+          <button type="button" role="tab" data-metric="accuracy" aria-selected="false">Accuracy</button>
+          <button type="button" role="tab" data-metric="finalAccuracy" aria-selected="false">Final accuracy</button>
+          <button type="button" role="tab" data-metric="seconds" aria-selected="false">Time</button>
+        </div>
+      </div>
+      <div id="chart" class="chart" role="tabpanel" aria-labelledby="progress-title"></div>
+    </section>
   </main>
 
   <!-- Classic scripts (not modules) so the page also works when opened directly from disk. -->
   <script src="js/texts.js"></script>
   <script src="js/engine.js"></script>
   <script src="js/storage.js"></script>
+  <script src="js/chart.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
