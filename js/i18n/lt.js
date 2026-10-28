@@ -3,7 +3,7 @@
 const TRANSLATIONS_LT = {
   // Text people see on the page, including hover tooltips.
   text: {
-    appTitle: "Spausdinimo treniruoklis",
+    appTitle: "Rašymo treniruoklis",
     stats: {
       wpm: "Ž/min:",
       accuracy: "Tikslumas:",
