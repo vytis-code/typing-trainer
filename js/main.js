@@ -2,20 +2,16 @@ const textEl = document.getElementById("text");
 const wpmEl = document.getElementById("wpm");
 const accuracyEl = document.getElementById("accuracy");
 const finalAccuracyEl = document.getElementById("final-accuracy");
-const timeEl = document.getElementById("time");
 
 let textIndex = 0;
 let session;
 let charEls = [];
-let timerId = null;
 // Stats of the last finished exercise, shown until a new one finishes. Survives a page reload.
 let lastResult = loadAttempts().at(-1) ?? null;
 
 function start(index) {
   textIndex = index;
   session = createSession(TEXTS[textIndex]);
-  clearInterval(timerId);
-  timerId = null;
 
   textEl.innerHTML = "";
   charEls = [...session.target].map((ch) => {
@@ -36,10 +32,9 @@ function renderLastResult() {
   setStat(wpmEl, lastResult?.wpm);
   setStat(accuracyEl, lastResult?.accuracy);
   setStat(finalAccuracyEl, lastResult?.finalAccuracy);
-  setStat(timeEl, lastResult?.seconds);
 }
 
-// Writes a number, or "–" when there is none. The unit right after it (%, s) is hidden with the dash.
+// Writes a number, or "–" when there is none. The unit right after it (%) is hidden with the dash.
 function setStat(el, value) {
   const missing = value === undefined;
   el.textContent = missing ? "–" : value;
@@ -57,13 +52,6 @@ function render() {
   // With a wrong last letter the cursor waits after it, until Backspace is pressed.
   const waitingAtEnd = session.typed.length === charEls.length && !isFinished(session);
   charEls.at(-1).classList.toggle("current-end", waitingAtEnd);
-  renderTime();
-}
-
-// The time counts live once typing starts; before that it keeps showing the last result.
-function renderTime() {
-  if (session.startTime === null) return;
-  setStat(timeEl, getStats(session, performance.now()).seconds);
 }
 
 function renderFinalStats() {
@@ -83,16 +71,36 @@ const METRICS = {
   accuracy: { label: "Accuracy", unit: "%", minSpan: 5, max: 100 },
   finalAccuracy: { label: "Final accuracy", unit: "%", minSpan: 5, max: 100 },
   seconds: { label: "Time", unit: "s", minSpan: 5 },
+  charCount: { label: "Symbols", unit: "", minSpan: 10 },
 };
 let chartMetric = "wpm";
 
 function renderProgress() {
   const attempts = loadAttempts();
   const first = Math.max(0, attempts.length - CHART_ATTEMPTS);
-  const points = attempts.slice(first)
+  const recent = attempts.slice(first);
+  const points = recent
     .map((a, i) => ({ value: a[chartMetric], number: first + i + 1, date: a.date }))
     .filter((p) => typeof p.value === "number");
   renderChart(chartEl, points, METRICS[chartMetric]);
+  renderAverages(recent);
+}
+
+const avgWpmEl = document.getElementById("avg-wpm");
+const avgAccuracyEl = document.getElementById("avg-accuracy");
+const avgFinalAccuracyEl = document.getElementById("avg-final-accuracy");
+
+// Plain mean of the attempts that have the stat, rounded; undefined when there are none.
+function average(attempts, key) {
+  const values = attempts.map((a) => a[key]).filter((v) => typeof v === "number");
+  if (values.length === 0) return undefined;
+  return Math.round(values.reduce((sum, v) => sum + v, 0) / values.length);
+}
+
+function renderAverages(attempts) {
+  setStat(avgWpmEl, average(attempts, "wpm"));
+  setStat(avgAccuracyEl, average(attempts, "accuracy"));
+  setStat(avgFinalAccuracyEl, average(attempts, "finalAccuracy"));
 }
 
 tabEls.forEach((tab) => {
@@ -109,7 +117,7 @@ const toggleChartEl = document.getElementById("toggle-chart");
 
 function setChartVisible(visible) {
   progressEl.hidden = !visible;
-  toggleChartEl.textContent = visible ? "Hide graph" : "Show graph";
+  toggleChartEl.textContent = visible ? "Hide statistics" : "Show statistics";
   toggleChartEl.setAttribute("aria-expanded", visible);
   // While hidden the chart has no width to draw to, so draw it fresh when it appears.
   if (visible) renderProgress();
@@ -156,24 +164,17 @@ textEl.addEventListener("keydown", (e) => {
   } else if (e.key.length === 1) {
     // Printable character (Shift is already applied to e.key).
     e.preventDefault(); // stops Space from scrolling the page
-    const wasStarted = session.startTime !== null;
     typeChar(session, e.key, performance.now());
-    if (!wasStarted) timerId = setInterval(renderTime, 250);
   } else {
     return;
   }
 
   render();
 
-  if (isFinished(session)) {
-    clearInterval(timerId);
-    renderFinalStats();
-  }
+  if (isFinished(session)) renderFinalStats();
 });
 
-// Leaving the text box pauses the clock; the overlay and blur come from CSS.
-textEl.addEventListener("blur", () => clearInterval(timerId));
-
+// Leaving the text box shows the overlay and blur (pure CSS).
 // Coming back to a text that was already started restarts it from zero.
 // A fresh session (nothing typed yet) is left as it is, so start() focusing it doesn't loop.
 textEl.addEventListener("focus", () => {

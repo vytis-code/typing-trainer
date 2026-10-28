@@ -13,23 +13,22 @@
     <div class="stats" aria-live="polite">
       <!-- Only the numbers are bold; a unit is hidden while its value is "–". -->
       <span>WPM: <strong id="wpm">–</strong></span>
-      <span title="Final: mistakes you fixed with Backspace don't count">
+      <span>
         Accuracy: <strong id="accuracy">–</strong><span class="unit">%</span>
-        (final <strong id="final-accuracy">–</strong><span class="unit">%</span>)
+        (<span class="has-tip" tabindex="0" aria-describedby="final-tip">final <strong id="final-accuracy">–</strong><span class="unit">%</span><span id="final-tip" class="tip" role="tooltip">Accuracy after correcting mistakes</span></span>)
       </span>
-      <span>Time: <strong id="time">–</strong><span class="unit">s</span></span>
     </div>
 
     <div class="text-wrap">
       <div id="text" class="text" tabindex="0" aria-label="Text to type. Start typing to begin."></div>
       <!-- Shown on top of the blurred text whenever the text box is not focused. -->
-      <div class="overlay" aria-hidden="true">Click here to start typing.<br>Backspace fixes mistakes.</div>
+      <div class="overlay" aria-hidden="true">Click here to start typing.</div>
     </div>
 
     <div class="controls">
       <button id="restart" type="button">Restart <kbd>Esc</kbd></button>
       <button id="next" type="button" title="Enter works before you start typing or after finishing a text">New text <kbd>Enter</kbd></button>
-      <button id="toggle-chart" type="button" aria-controls="progress" aria-expanded="true">Hide graph</button>
+      <button id="toggle-chart" type="button" aria-controls="progress" aria-expanded="true">Hide statistics</button>
     </div>
 
     <section id="progress" class="progress" aria-labelledby="progress-title">
@@ -40,9 +39,16 @@
           <button type="button" role="tab" data-metric="accuracy" aria-selected="false">Accuracy</button>
           <button type="button" role="tab" data-metric="finalAccuracy" aria-selected="false">Final accuracy</button>
           <button type="button" role="tab" data-metric="seconds" aria-selected="false">Time</button>
+          <button type="button" role="tab" data-metric="charCount" aria-selected="false" title="Number of characters in the text">Symbols</button>
         </div>
       </div>
       <div id="chart" class="chart" role="tabpanel" aria-labelledby="progress-title"></div>
+      <!-- Averages of the same attempts the graph shows. -->
+      <div class="averages">
+        <span>Average WPM: <strong id="avg-wpm">–</strong></span>
+        <span>Average accuracy: <strong id="avg-accuracy">–</strong><span class="unit">%</span></span>
+        <span>Average final accuracy: <strong id="avg-final-accuracy">–</strong><span class="unit">%</span></span>
+      </div>
     </section>
   </main>
 
