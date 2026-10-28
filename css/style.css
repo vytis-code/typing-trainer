@@ -36,6 +36,42 @@ h1 {
   margin-bottom: 1rem;
 }
 
+/* Title on the left, language switch on the right; they stack on very narrow screens. */
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.lang-switch {
+  display: flex;
+  gap: 0.25rem;
+  background: var(--panel);
+  border-radius: 8px;
+  padding: 0.25rem;
+}
+
+.lang-switch button {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.3rem 0.6rem;
+}
+
+.lang-switch button:hover {
+  color: var(--text);
+}
+
+.lang-switch button[aria-pressed="true"] {
+  background: var(--bg);
+  color: var(--text);
+}
+
 .stats {
   display: flex;
   gap: 2rem;
@@ -222,6 +258,7 @@ button {
 
 .tabs {
   display: flex;
+  flex-wrap: wrap; /* longer labels (e.g. Lithuanian) wrap on narrow screens instead of sticking out */
   gap: 0.25rem;
   background: var(--panel);
   border-radius: 8px;

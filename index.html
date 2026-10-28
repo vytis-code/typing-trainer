@@ -10,7 +10,15 @@
   <!-- All text comes from js/i18n/<language>.js: data-i18n fills an element's text,
        data-i18n-title its tooltip, data-i18n-aria-label what screen readers hear. -->
   <main class="app">
-    <h1 data-i18n="text.appTitle"></h1>
+    <header class="app-header">
+      <h1 data-i18n="text.appTitle"></h1>
+      <!-- One button per language in js/i18n/. Each name is written in its own language, so it isn't translated.
+           main.js only marks the current one with aria-pressed. -->
+      <div id="language-switch" class="lang-switch" role="group" data-i18n-aria-label="aria.languageSwitch">
+        <button type="button" lang="en" data-language="en" title="English" aria-label="English" aria-pressed="false">EN</button>
+        <button type="button" lang="lt" data-language="lt" title="Lietuvių" aria-label="Lietuvių" aria-pressed="false">LT</button>
+      </div>
+    </header>
 
     <div class="stats" aria-live="polite">
       <!-- Only the numbers are bold; a unit is hidden while its value is "–". -->
@@ -58,6 +66,7 @@
 
   <!-- Classic scripts (not modules) so the page also works when opened directly from disk. -->
   <script src="js/i18n/en.js"></script>
+  <script src="js/i18n/lt.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/texts.js"></script>
   <script src="js/engine.js"></script>

@@ -1,4 +1,5 @@
-// Fill in all page text first, so everything below can rely on it being there.
+// Pick the language and fill in all page text first, so everything below can rely on it.
+setLanguage(pickLanguage(loadSettings().language));
 applyTranslations();
 
 const textEl = document.getElementById("text");
@@ -69,7 +70,6 @@ function renderFinalStats() {
 const chartEl = document.getElementById("chart");
 const tabEls = document.querySelectorAll(".tabs [role=tab]");
 const CHART_ATTEMPTS = 20;
-document.getElementById("progress-sub").textContent = t("text.progress.lastAttempts", { count: CHART_ATTEMPTS });
 // minSpan: the smallest y range shown, so tiny differences don't look like big swings.
 // Each stat's name comes from text.metrics.<key> in the translations.
 const METRICS = {
@@ -112,7 +112,7 @@ function renderAverages(attempts) {
 tabEls.forEach((tab) => {
   tab.addEventListener("click", () => {
     chartMetric = tab.dataset.metric;
-    tabEls.forEach((t) => t.setAttribute("aria-selected", t === tab));
+    tabEls.forEach((other) => other.setAttribute("aria-selected", other === tab));
     renderProgress();
   });
 });
@@ -123,8 +123,8 @@ const toggleChartEl = document.getElementById("toggle-chart");
 
 function setChartVisible(visible) {
   progressEl.hidden = !visible;
-  toggleChartEl.textContent = t(visible ? "text.controls.hideStats" : "text.controls.showStats");
   toggleChartEl.setAttribute("aria-expanded", visible);
+  renderDynamicTexts();
   // While hidden the chart has no width to draw to, so draw it fresh when it appears.
   if (visible) renderProgress();
 }
@@ -135,7 +135,38 @@ toggleChartEl.addEventListener("click", () => {
   saveSetting("chartVisible", visible);
 });
 
+// Texts that depend on state or numbers, so the HTML can't hold their keys directly.
+function renderDynamicTexts() {
+  toggleChartEl.textContent = t(progressEl.hidden ? "text.controls.showStats" : "text.controls.hideStats");
+  document.getElementById("progress-sub").textContent = t("text.progress.lastAttempts", { count: CHART_ATTEMPTS });
+}
+
 setChartVisible(loadSettings().chartVisible ?? true);
+
+// Language switch: the buttons are in index.html; this marks the current one.
+const languageButtons = document.querySelectorAll("#language-switch [data-language]");
+
+function updateLanguageSwitch() {
+  languageButtons.forEach((btn) => btn.setAttribute("aria-pressed", btn.dataset.language === language));
+}
+
+languageButtons.forEach((btn) => {
+  // Keep focus where it is (e.g. the text box), like the other buttons.
+  btn.addEventListener("mousedown", (e) => e.preventDefault());
+  btn.addEventListener("click", () => switchLanguage(btn.dataset.language));
+});
+
+function switchLanguage(code) {
+  if (code === language) return;
+  setLanguage(code);
+  saveSetting("language", code);
+  applyTranslations();
+  updateLanguageSwitch();
+  renderDynamicTexts();
+  renderProgress(); // chart labels, tooltip text and dates
+}
+
+updateLanguageSwitch();
 
 // The chart is drawn to the container's width, so redraw when that changes.
 let chartWidth = 0;

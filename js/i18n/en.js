@@ -52,6 +52,7 @@ const TRANSLATIONS_EN = {
   aria: {
     typingText: "Text to type. Start typing to begin.",
     statTabs: "Stat to show",
+    languageSwitch: "Language",
     chart: "{label} over the last {count} attempts. Latest {latest}. Use arrow keys to step through attempts.",
   },
 };
