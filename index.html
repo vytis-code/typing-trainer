@@ -3,56 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Typing Trainer</title>
+  <title data-i18n="text.appTitle"></title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <!-- All text comes from js/i18n/<language>.js: data-i18n fills an element's text,
+       data-i18n-title its tooltip, data-i18n-aria-label what screen readers hear. -->
   <main class="app">
-    <h1>Typing Trainer</h1>
+    <h1 data-i18n="text.appTitle"></h1>
 
     <div class="stats" aria-live="polite">
       <!-- Only the numbers are bold; a unit is hidden while its value is "–". -->
-      <span>WPM: <strong id="wpm">–</strong></span>
+      <span><span data-i18n="text.stats.wpm"></span> <strong id="wpm">–</strong></span>
       <span>
-        Accuracy: <strong id="accuracy">–</strong><span class="unit">%</span>
-        (<span class="has-tip" tabindex="0" aria-describedby="final-tip">final <strong id="final-accuracy">–</strong><span class="unit">%</span><span id="final-tip" class="tip" role="tooltip">Accuracy after correcting mistakes</span></span>)
+        <span data-i18n="text.stats.accuracy"></span> <strong id="accuracy">–</strong><span class="unit">%</span>
+        (<span class="has-tip" tabindex="0" aria-describedby="final-tip"><span data-i18n="text.stats.final"></span> <strong id="final-accuracy">–</strong><span class="unit">%</span><span id="final-tip" class="tip" role="tooltip" data-i18n="text.tips.finalAccuracy"></span></span>)
       </span>
     </div>
 
     <div class="text-wrap">
-      <div id="text" class="text" tabindex="0" aria-label="Text to type. Start typing to begin."></div>
+      <div id="text" class="text" tabindex="0" data-i18n-aria-label="aria.typingText"></div>
       <!-- Shown on top of the blurred text whenever the text box is not focused. -->
-      <div class="overlay" aria-hidden="true">Click here to start typing.</div>
+      <div class="overlay" aria-hidden="true" data-i18n="text.typing.overlay"></div>
     </div>
 
     <div class="controls">
-      <button id="restart" type="button">Restart <kbd>Esc</kbd></button>
-      <button id="next" type="button" title="Enter works before you start typing or after finishing a text">New text <kbd>Enter</kbd></button>
-      <button id="toggle-chart" type="button" aria-controls="progress" aria-expanded="true">Hide statistics</button>
+      <button id="restart" type="button"><span data-i18n="text.controls.restart"></span> <kbd data-i18n="text.keys.escape"></kbd></button>
+      <button id="next" type="button" data-i18n-title="text.tips.newText"><span data-i18n="text.controls.newText"></span> <kbd data-i18n="text.keys.enter"></kbd></button>
+      <!-- Label is set from main.js, since it switches between hide and show. -->
+      <button id="toggle-chart" type="button" aria-controls="progress" aria-expanded="true"></button>
     </div>
 
     <section id="progress" class="progress" aria-labelledby="progress-title">
       <div class="progress-header">
-        <h2 id="progress-title">Progress <span class="progress-sub">last 20 attempts</span></h2>
-        <div class="tabs" role="tablist" aria-label="Stat to show">
-          <button type="button" role="tab" data-metric="wpm" aria-selected="true">WPM</button>
-          <button type="button" role="tab" data-metric="accuracy" aria-selected="false">Accuracy</button>
-          <button type="button" role="tab" data-metric="finalAccuracy" aria-selected="false">Final accuracy</button>
-          <button type="button" role="tab" data-metric="seconds" aria-selected="false">Time</button>
-          <button type="button" role="tab" data-metric="charCount" aria-selected="false" title="Number of characters in the text">Symbols</button>
+        <!-- The subtitle is set from main.js, because it includes the attempt count. -->
+        <h2 id="progress-title"><span data-i18n="text.progress.title"></span> <span id="progress-sub" class="progress-sub"></span></h2>
+        <div class="tabs" role="tablist" data-i18n-aria-label="aria.statTabs">
+          <button type="button" role="tab" data-metric="wpm" aria-selected="true" data-i18n="text.metrics.wpm"></button>
+          <button type="button" role="tab" data-metric="accuracy" aria-selected="false" data-i18n="text.metrics.accuracy"></button>
+          <button type="button" role="tab" data-metric="finalAccuracy" aria-selected="false" data-i18n="text.metrics.finalAccuracy"></button>
+          <button type="button" role="tab" data-metric="seconds" aria-selected="false" data-i18n="text.metrics.seconds"></button>
+          <button type="button" role="tab" data-metric="charCount" aria-selected="false" data-i18n="text.metrics.charCount" data-i18n-title="text.tips.charCount"></button>
         </div>
       </div>
       <div id="chart" class="chart" role="tabpanel" aria-labelledby="progress-title"></div>
       <!-- Averages of the same attempts the graph shows. -->
       <div class="averages">
-        <span>Average WPM: <strong id="avg-wpm">–</strong></span>
-        <span>Average accuracy: <strong id="avg-accuracy">–</strong><span class="unit">%</span></span>
-        <span>Average final accuracy: <strong id="avg-final-accuracy">–</strong><span class="unit">%</span></span>
+        <span><span data-i18n="text.averages.wpm"></span> <strong id="avg-wpm">–</strong></span>
+        <span><span data-i18n="text.averages.accuracy"></span> <strong id="avg-accuracy">–</strong><span class="unit">%</span></span>
+        <span class="has-tip" tabindex="0" aria-describedby="avg-final-tip"><span data-i18n="text.averages.finalAccuracy"></span> <strong id="avg-final-accuracy">–</strong><span class="unit">%</span><span id="avg-final-tip" class="tip" role="tooltip" data-i18n="text.tips.finalAccuracy"></span></span>
       </div>
     </section>
   </main>
 
   <!-- Classic scripts (not modules) so the page also works when opened directly from disk. -->
+  <script src="js/i18n/en.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/texts.js"></script>
   <script src="js/engine.js"></script>
   <script src="js/storage.js"></script>

@@ -19,8 +19,8 @@ function niceStep(raw) {
 
 // Fits the y range to the values shown, with some air above and below, so the line
 // follows the user's current level instead of being squashed between 0 and a fixed top.
-// minSpan stops small wobbles from looking like huge swings.
-function yDomain(values, { minSpan, min = 0, max = Infinity }) {
+// minSpan stops small wobbles from looking like huge swings; it defaults to 1 so the range is never zero.
+function yDomain(values, { minSpan = 1, min = 0, max = Infinity }) {
   const dataLo = Math.min(...values);
   const dataHi = Math.max(...values);
   const mid = (dataLo + dataHi) / 2;
@@ -44,8 +44,13 @@ function formatValue(value, metric) {
   return `${Math.round(value)}${metric.unit}`;
 }
 
+// Dates follow the page language (set by applyTranslations). A missing or broken date shows "–",
+// like other missing values.
 function formatDate(iso) {
-  return new Date(iso).toLocaleString(undefined, {
+  // Only strings count: new Date(null) would quietly give 1 January 1970.
+  const date = typeof iso === "string" ? new Date(iso) : null;
+  if (!date || Number.isNaN(date.getTime())) return "–";
+  return date.toLocaleString(document.documentElement.lang, {
     month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
   });
 }
@@ -57,7 +62,7 @@ function renderChart(container, points, metric) {
   if (points.length === 0) {
     const empty = document.createElement("p");
     empty.className = "chart-empty";
-    empty.textContent = "Finish an exercise to see your progress here.";
+    empty.textContent = t("text.progress.empty");
     container.append(empty);
     return;
   }
@@ -74,7 +79,7 @@ function renderChart(container, points, metric) {
   const svg = svgEl("svg", {
     width, height: CHART_HEIGHT, viewBox: `0 0 ${width} ${CHART_HEIGHT}`,
     tabindex: 0, role: "img",
-    "aria-label": `${metric.label} over the last ${n} attempts. Latest ${formatValue(last.value, metric)}. Use arrow keys to step through attempts.`,
+    "aria-label": t("aria.chart", { label: metric.label, count: n, latest: formatValue(last.value, metric) }),
   });
 
   // Gridlines and y ticks.
@@ -129,7 +134,7 @@ function renderChart(container, points, metric) {
     hoverDot.setAttribute("visibility", "visible");
 
     tipValue.textContent = formatValue(points[i].value, metric);
-    tipMeta.textContent = `Attempt #${points[i].number} · ${formatDate(points[i].date)}`;
+    tipMeta.textContent = t("text.progress.tooltip", { number: points[i].number, date: formatDate(points[i].date) });
     tooltip.hidden = false;
     // Keep the tooltip inside the chart; put it below the point if there's no room above.
     const left = Math.min(Math.max(px - tooltip.offsetWidth / 2, 4), width - tooltip.offsetWidth - 4);

@@ -1,3 +1,6 @@
+// Fill in all page text first, so everything below can rely on it being there.
+applyTranslations();
+
 const textEl = document.getElementById("text");
 const wpmEl = document.getElementById("wpm");
 const accuracyEl = document.getElementById("accuracy");
@@ -34,9 +37,10 @@ function renderLastResult() {
   setStat(finalAccuracyEl, lastResult?.finalAccuracy);
 }
 
-// Writes a number, or "–" when there is none. The unit right after it (%) is hidden with the dash.
+// Writes a number, or "–" when there is none (or the value isn't a number).
+// The unit right after it (%) is hidden with the dash.
 function setStat(el, value) {
-  const missing = value === undefined;
+  const missing = typeof value !== "number" || Number.isNaN(value);
   el.textContent = missing ? "–" : value;
   const unit = el.nextElementSibling;
   if (unit?.classList.contains("unit")) unit.hidden = missing;
@@ -51,7 +55,7 @@ function render() {
   });
   // With a wrong last letter the cursor waits after it, until Backspace is pressed.
   const waitingAtEnd = session.typed.length === charEls.length && !isFinished(session);
-  charEls.at(-1).classList.toggle("current-end", waitingAtEnd);
+  charEls.at(-1)?.classList.toggle("current-end", waitingAtEnd); // ?. in case a text is ever empty
 }
 
 function renderFinalStats() {
@@ -65,13 +69,15 @@ function renderFinalStats() {
 const chartEl = document.getElementById("chart");
 const tabEls = document.querySelectorAll(".tabs [role=tab]");
 const CHART_ATTEMPTS = 20;
+document.getElementById("progress-sub").textContent = t("text.progress.lastAttempts", { count: CHART_ATTEMPTS });
 // minSpan: the smallest y range shown, so tiny differences don't look like big swings.
+// Each stat's name comes from text.metrics.<key> in the translations.
 const METRICS = {
-  wpm: { label: "WPM", unit: "", minSpan: 10 },
-  accuracy: { label: "Accuracy", unit: "%", minSpan: 5, max: 100 },
-  finalAccuracy: { label: "Final accuracy", unit: "%", minSpan: 5, max: 100 },
-  seconds: { label: "Time", unit: "s", minSpan: 5 },
-  charCount: { label: "Symbols", unit: "", minSpan: 10 },
+  wpm: { unit: "", minSpan: 10 },
+  accuracy: { unit: "%", minSpan: 5, max: 100 },
+  finalAccuracy: { unit: "%", minSpan: 5, max: 100 },
+  seconds: { unit: "s", minSpan: 5 },
+  charCount: { unit: "", minSpan: 10 },
 };
 let chartMetric = "wpm";
 
@@ -82,7 +88,7 @@ function renderProgress() {
   const points = recent
     .map((a, i) => ({ value: a[chartMetric], number: first + i + 1, date: a.date }))
     .filter((p) => typeof p.value === "number");
-  renderChart(chartEl, points, METRICS[chartMetric]);
+  renderChart(chartEl, points, { ...METRICS[chartMetric], label: t(`text.metrics.${chartMetric}`) });
   renderAverages(recent);
 }
 
@@ -117,7 +123,7 @@ const toggleChartEl = document.getElementById("toggle-chart");
 
 function setChartVisible(visible) {
   progressEl.hidden = !visible;
-  toggleChartEl.textContent = visible ? "Hide statistics" : "Show statistics";
+  toggleChartEl.textContent = t(visible ? "text.controls.hideStats" : "text.controls.showStats");
   toggleChartEl.setAttribute("aria-expanded", visible);
   // While hidden the chart has no width to draw to, so draw it fresh when it appears.
   if (visible) renderProgress();
@@ -143,6 +149,8 @@ new ResizeObserver(() => {
 textEl.addEventListener("keydown", (e) => {
   // Leave browser shortcuts (Ctrl+R, Ctrl+L, ...) alone.
   if (e.ctrlKey || e.metaKey || e.altKey) return;
+  // Some input methods send key events without a usable key.
+  if (typeof e.key !== "string") return;
 
   // Shortcuts. Enter only works before typing or after finishing, so a stray Enter can't throw away progress.
   if (e.key === "Escape") {

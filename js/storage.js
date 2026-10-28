@@ -3,10 +3,18 @@
 const STORAGE_KEY = "typing-trainer";
 const STORAGE_VERSION = 1;
 
+function isPlainObject(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 function loadData() {
   try {
     const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (data?.version === STORAGE_VERSION && Array.isArray(data.attempts)) return data;
+    if (data?.version === STORAGE_VERSION && Array.isArray(data.attempts)) {
+      // Drop broken entries (null, numbers, ...) so one bad attempt can't break the chart or averages.
+      data.attempts = data.attempts.filter(isPlainObject);
+      return data;
+    }
   } catch {
     // Storage blocked (e.g. private mode) or broken data: start empty.
   }
@@ -22,7 +30,9 @@ const SETTINGS_KEY = "typing-trainer-settings";
 
 function loadSettings() {
   try {
-    return JSON.parse(localStorage.getItem(SETTINGS_KEY)) ?? {};
+    // Anything but an object (a number, text, null) counts as no settings.
+    const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+    return isPlainObject(settings) ? settings : {};
   } catch {
     return {};
   }
